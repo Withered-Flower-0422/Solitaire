@@ -1,6 +1,6 @@
 # Solitaire
 
-Clasic Spider Solitaire game written in Python.</br>(**ONE COLOR VERSION ONLY**)
+Classic Spider Solitaire game written in Python.</br>(**ONE COLOR VERSION ONLY**)
 
 ## Current Version
 
