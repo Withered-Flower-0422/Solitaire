@@ -16,7 +16,7 @@ Clasic Spider Solitaire game written in Python.</br>(**ONE COLOR VERSION ONLY**)
 
 ## Installation
 
-You can download the latest release from the [releases page](https://github.com/Withered-Flower-0422/AoC_Helper/releases) and install it.
+You can download the latest release from the [releases page](https://github.com/Withered-Flower-0422/Solitaire/releases) and install it.
 
 ## Game Rules
 
