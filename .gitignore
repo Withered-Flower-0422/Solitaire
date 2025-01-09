@@ -1,0 +1,6 @@
+*.spec
+*.code-workspace
+
+/build/
+/dist/
+*/__pycache__/
