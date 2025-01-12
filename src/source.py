@@ -32,7 +32,7 @@ src_path = {
         },
         # buttons images
         "undo": _base_path / "pics" / "buttons" / "undo" / "undo.png",
-        "suit": {
+        "suits": {
             i: _base_path / "pics" / "buttons" / "suit" / f"{i}.png" for i in (1, 2, 4)
         },
         "deals": [

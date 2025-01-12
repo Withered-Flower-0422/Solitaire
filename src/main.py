@@ -88,17 +88,17 @@ class Solitaire_Game:
             "one_suit": Button(
                 (300, 550),
                 lambda: self.start_game(1),
-                src_path["pics"]["suit"][1],
+                src_path["pics"]["suits"][1],
             ),
             "two_suit": Button(
                 (440, 550),
                 lambda: self.start_game(2),
-                src_path["pics"]["suit"][2],
+                src_path["pics"]["suits"][2],
             ),
             "four_suit": Button(
                 (580, 550),
                 lambda: self.start_game(4),
-                src_path["pics"]["suit"][4],
+                src_path["pics"]["suits"][4],
             ),
             "undo": Button(
                 (872, 550),
