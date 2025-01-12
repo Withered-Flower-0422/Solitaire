@@ -1,28 +1,52 @@
 import os
 import sys
+from pathlib import Path
 from pprint import pprint
 
-_base_path = sys._MEIPASS if getattr(sys, "frozen", False) else os.path.curdir
-
-
-def _get_path(*args):
-    return os.path.join(_base_path, *args)
+_base_path = Path(sys._MEIPASS if getattr(sys, "frozen", False) else os.path.curdir)
 
 
 src_path = {
     "pics": {
+        # background images
+        "background": _base_path / "pics" / "background" / "background.png",
         # cards images
-        "cards": [_get_path("pics", "cards", f"{i}.png") for i in range(0, 14)],
+        "cards": {
+            "back": _base_path / "pics" / "cards" / "back" / "back.png",
+            "club": {
+                i: _base_path / "pics" / "cards" / "club" / f"{i}.png"
+                for i in range(1, 14)
+            },
+            "diamond": {
+                i: _base_path / "pics" / "cards" / "diamond" / f"{i}.png"
+                for i in range(1, 14)
+            },
+            "heart": {
+                i: _base_path / "pics" / "cards" / "heart" / f"{i}.png"
+                for i in range(1, 14)
+            },
+            "spade": {
+                i: _base_path / "pics" / "cards" / "spade" / f"{i}.png"
+                for i in range(1, 14)
+            },
+        },
         # buttons images
-        "undo": _get_path("pics", "buttons", "undo.png"),
-        "deals": [_get_path("pics", "buttons", f"deal_{i}.png") for i in range(0, 6)],
+        "undo": _base_path / "pics" / "buttons" / "undo" / "undo.png",
+        "suit": {
+            i: _base_path / "pics" / "buttons" / "suit" / f"{i}.png" for i in (1, 2, 4)
+        },
+        "deals": [
+            _base_path / "pics" / "buttons" / "deal" / f"{i}.png" for i in range(0, 6)
+        ],
         # displays images
-        "displays": [_get_path("pics", "displays", f"{i}.png") for i in range(0, 9)],
+        "displays": [
+            _base_path / "pics" / "displays" / f"{i}.png" for i in range(0, 9)
+        ],
         # icon
-        "icon": _get_path("icon", "solitaire.ico"),
+        "icon": _base_path / "icon" / "solitaire.ico",
     },
     "sounds": {
-        sound_name: _get_path("sounds", f"{sound_name}.wav")
+        sound_name: _base_path / "sounds" / f"{sound_name}.wav"
         for sound_name in ["complete", "deal", "done", "error", "pick", "undo"]
     },
 }

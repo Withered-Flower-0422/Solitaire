@@ -1,15 +1,31 @@
 import random
+from typing import Literal
 
-from stack import Stack
+from stack import Stack, Card
 
 
 class Solitaire:
-    def __init__(self):
+    def __init__(self, suit_num: Literal[1, 2, 4] = 1):
         # cache
-        self.caches: list[tuple[tuple[tuple[int]], tuple[int], tuple[int], int]] = []
+        self.caches: list[tuple[tuple[tuple[Card]], tuple[int], tuple[Card], int]] = []
 
-        # prepare 8 shuffled decks of cards
-        self.cards = list(range(13, 0, -1)) * 8
+        # prepare 8 shuffled suits of cards
+        self.cards: list[Card]
+        match suit_num:
+            case 1:
+                self.cards = [("spade", i) for i in range(1, 14)] * 8
+            case 2:
+                self.cards = (
+                    [("spade", i) for i in range(1, 14)]
+                    + [("heart", i) for i in range(1, 14)]
+                ) * 4
+            case 4:
+                self.cards = (
+                    [("spade", i) for i in range(1, 14)]
+                    + [("heart", i) for i in range(1, 14)]
+                    + [("diamond", i) for i in range(1, 14)]
+                    + [("club", i) for i in range(1, 14)]
+                ) * 2
         random.shuffle(self.cards)
 
         # create 10 stacks of cards, index 0-3 contain 6 cards, index 4-9 contain 5 cards
@@ -19,7 +35,7 @@ class Solitaire:
         ]
 
         # no cards are held at the beginning
-        self.holdding: list[int] | None = None
+        self.holdding: list[Card] | None = None
 
         # no deck is done at the beginning
         self.done_decks = 0

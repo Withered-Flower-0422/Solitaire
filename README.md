@@ -1,11 +1,11 @@
 # Solitaire
 
-Classic Spider Solitaire game written in Python.</br>(**ONE COLOR VERSION ONLY**)
+Classic Spider Solitaire game written in Python.
 
 ## Current Version
 
-- Version: 1.0.0
-- Release Date: 2025-01-10
+- Version: 1.1.0
+- Release Date: 2025-01-12
 
 ## About
 

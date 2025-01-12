@@ -1,9 +1,15 @@
 import sys
 import pygame
+from typing import Literal
 
 from solitaire import Solitaire
 
 from source import src_path
+
+# about
+VERSION = "1.1.0"
+AUTHOR = "Withered_Flower"
+EMAIL = "2734850178@qq.com"
 
 
 class Display:
@@ -34,6 +40,8 @@ class Button(Display):
 
 class Solitaire_Game:
     def __init__(self):
+        self.is_playing = False
+
         # create solitaire game object
         self.solitaire = Solitaire()
 
@@ -44,9 +52,15 @@ class Solitaire_Game:
         pygame.display.set_icon(pygame.image.load(src_path["pics"]["icon"]))
 
         # pics
-        self.cards_pics = [
-            pygame.image.load(src_path["pics"]["cards"][i]) for i in range(0, 14)
-        ]
+        self.background = pygame.image.load(src_path["pics"]["background"])
+        self.cards_pics = {
+            suit: {
+                i: pygame.image.load(src_path["pics"]["cards"][suit][i])
+                for i in range(1, 14)
+            }
+            for suit in ["heart", "diamond", "club", "spade"]
+        }
+        self.cards_pics["back"] = pygame.image.load(src_path["pics"]["cards"]["back"])
 
         # snds
         self.sounds = {
@@ -71,6 +85,21 @@ class Solitaire_Game:
 
         # create buttons
         self.btns = {
+            "one_suit": Button(
+                (300, 550),
+                lambda: self.start_game(1),
+                src_path["pics"]["suit"][1],
+            ),
+            "two_suit": Button(
+                (440, 550),
+                lambda: self.start_game(2),
+                src_path["pics"]["suit"][2],
+            ),
+            "four_suit": Button(
+                (580, 550),
+                lambda: self.start_game(4),
+                src_path["pics"]["suit"][4],
+            ),
             "undo": Button(
                 (872, 550),
                 self.undo,
@@ -83,6 +112,11 @@ class Solitaire_Game:
             ),
         }
 
+    def start_game(self, suit_num: Literal[1, 2, 4]):
+        if not self.is_playing:
+            self.solitaire = Solitaire(suit_num)
+            self.is_playing = True
+
     def set_message(self, message: str):
         self.message = message
 
@@ -90,6 +124,8 @@ class Solitaire_Game:
         self.message = ""
 
     def deal_cards(self):
+        if not self.is_playing:
+            return
         if self.solitaire.done_decks == 8:
             return
         if self.solitaire.remaining_heaps() == 0:
@@ -106,6 +142,8 @@ class Solitaire_Game:
         )
 
     def undo(self):
+        if not self.is_playing:
+            return
         if self.solitaire.done_decks == 8:
             return
         if self.solitaire.undo():
@@ -119,6 +157,8 @@ class Solitaire_Game:
             )
 
     def get_chosen_card_pos(self, mouse_pos: tuple[int, int]):
+        if not self.is_playing:
+            return None
         for i, stack in enumerate(self.solitaire.stacks):
             for j in range(len(stack.cards) - 1, -1, -1):
                 if pygame.Rect(96 * i + 8, 12 + 30 * j, 80, 35).collidepoint(mouse_pos):
@@ -147,6 +187,7 @@ class Solitaire_Game:
     def handle_remake(self, event: pygame.Event):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
+                self.is_playing = False
                 self.solitaire = Solitaire()
                 self.displays["done"].img = pygame.image.load(
                     src_path["pics"]["displays"][self.solitaire.done_decks]
@@ -202,33 +243,50 @@ class Solitaire_Game:
         # 1.clear the screen
         self.screen.fill((0, 0, 0))
 
-        # 2.draw the cards on the screen
-        for i, stack in enumerate(self.solitaire.stacks):
-            for j, card in enumerate(stack.cards):
-                self.screen.blit(
-                    self.cards_pics[card if j > stack.visible_index else 0],
-                    (96 * i + 8, 12 + 30 * j),
-                )
+        if self.is_playing:
+            # 2.draw the cards on the screen
+            for i, stack in enumerate(self.solitaire.stacks):
+                for j, card in enumerate(stack.cards):
+                    suit, value = card
+                    if j <= stack.visible_index:
+                        self.screen.blit(
+                            self.cards_pics["back"], (96 * i + 8, 12 + 30 * j)
+                        )
+                    else:
+                        self.screen.blit(
+                            self.cards_pics[suit][value], (96 * i + 8, 12 + 30 * j)
+                        )
 
-        # 3.draw the displays and btns on the screen
-        for display in self.displays.values():
-            self.screen.blit(display.img, display.rect)
-        for btn in self.btns.values():
-            self.screen.blit(btn.img, btn.rect)
+            # 3.draw the displays and btns on the screen
+            for display in self.displays.values():
+                self.screen.blit(display.img, display.rect)
+            for btn in [self.btns["undo"], self.btns["deal"]]:
+                self.screen.blit(btn.img, btn.rect)
 
-        # 4.draw the holded card on the screen
-        if self.solitaire.holdding:
-            mouse_x, mouse_y = self.mouse
-            for i, card in enumerate(self.solitaire.holdding):
-                self.screen.blit(
-                    self.cards_pics[card], (mouse_x - 40, mouse_y + 32 * i - 16)
-                )
+            # 4.draw the holded card on the screen
+            if self.solitaire.holdding:
+                mouse_x, mouse_y = self.mouse
+                for i, card in enumerate(self.solitaire.holdding):
+                    suit, value = card
+                    self.screen.blit(
+                        self.cards_pics[suit][value],
+                        (mouse_x - 40, mouse_y + 32 * i - 16),
+                    )
 
-        # 5.show the message on the screen
-        if self.message:
-            font = pygame.font.Font(None, 32)
-            text = font.render(self.message, True, (255, 0, 0))
-            self.screen.blit(text, (248, 320))
+            # 5.show the message on the screen
+            if self.message:
+                font = pygame.font.Font(None, 32)
+                text = font.render(self.message, True, (255, 0, 0))
+                self.screen.blit(text, (248, 320))
+
+        else:  # show the start screen
+            self.screen.blit(self.background, (0, 0))
+            for btn in (
+                self.btns["one_suit"],
+                self.btns["two_suit"],
+                self.btns["four_suit"],
+            ):
+                self.screen.blit(btn.img, btn.rect)
 
         pygame.display.flip()
 
