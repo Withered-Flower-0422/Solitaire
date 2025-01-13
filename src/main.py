@@ -1,5 +1,6 @@
 import sys
 import pygame
+from time import time
 from typing import Literal
 
 from solitaire import Solitaire
@@ -7,7 +8,7 @@ from solitaire import Solitaire
 from source import src_path
 
 # about
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 AUTHOR = "Withered_Flower"
 EMAIL = "2734850178@qq.com"
 
@@ -50,6 +51,10 @@ class Solitaire_Game:
         self.screen = pygame.display.set_mode((960, 640))
         pygame.display.set_caption("Solitaire")
         pygame.display.set_icon(pygame.image.load(src_path["pics"]["icon"]))
+
+        # disable text input
+        pygame.key.set_text_input_rect(None)
+        pygame.key.stop_text_input()
 
         # pics
         self.background = pygame.image.load(src_path["pics"]["background"])
@@ -238,6 +243,7 @@ class Solitaire_Game:
         3. draw the displays and btns on the screen
         4. draw the holded card on the screen
         5. show the message on the screen
+        6. show the time / score / movements on the screen
         """
 
         # 1.clear the screen
@@ -278,6 +284,40 @@ class Solitaire_Game:
                 font = pygame.font.Font(None, 32)
                 text = font.render(self.message, True, (255, 0, 0))
                 self.screen.blit(text, (248, 320))
+
+            # 6.show the time / score / movements on the screen
+            t = int(
+                time() - self.solitaire.start_time
+                if self.solitaire.done_decks < 8
+                else self.solitaire.end_time - self.solitaire.start_time
+            )
+            m = t // 60
+            s = t % 60
+            font = pygame.font.Font(None, 28)
+            self.screen.blit(
+                font.render(
+                    f"Time: {m:02d}:{s:02d}",
+                    True,
+                    (255, 255, 255),
+                ),
+                (250, 600),
+            )
+            self.screen.blit(
+                font.render(
+                    f"Score: {self.solitaire.score}",
+                    True,
+                    (0, 255, 0),
+                ),
+                (415, 600),
+            )
+            self.screen.blit(
+                font.render(
+                    f"Movements: {self.solitaire.movements}",
+                    True,
+                    (0, 255, 255),
+                ),
+                (560, 600),
+            )
 
         else:  # show the start screen
             self.screen.blit(self.background, (0, 0))

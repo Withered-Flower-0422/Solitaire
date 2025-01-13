@@ -4,3 +4,5 @@
 /build/
 /dist/
 */__pycache__/
+
+src/_test.py

@@ -1,4 +1,5 @@
 import random
+from time import time
 from typing import Literal
 
 from stack import Stack, Card
@@ -6,8 +7,17 @@ from stack import Stack, Card
 
 class Solitaire:
     def __init__(self, suit_num: Literal[1, 2, 4] = 1):
+        # variables
+        self.score = 500
+        self.movements = 0
+        self.start_time = time()
+        self.end_time = None
+
         # cache
-        self.caches: list[tuple[tuple[tuple[Card]], tuple[int], tuple[Card], int]] = []
+        self.caches: list[
+            # stacks, visible indexes, remaining cards, done decks, score
+            tuple[tuple[tuple[Card]], tuple[int], tuple[Card], int, int]
+        ] = []
 
         # prepare 8 shuffled suits of cards
         self.cards: list[Card]
@@ -63,15 +73,21 @@ class Solitaire:
             self.holdding[0]
         ):
             self.stacks[stack_idx].cards.extend(self.holdding)
+            s = -1
 
             # check if the deck is done, if so, remove the done deck
             if self.stacks[stack_idx].check_done():
                 self.done_decks += 1
+                s = 100
                 can_done = True
+                if self.done_decks == 8:
+                    self.end_time = time()
 
             for stack in self.stacks:
                 stack.update_visiblity()
 
+            self.score += s
+            self.movements += 1
             self.cache()
         else:
             self.stacks[origin_stack_idx].cards.extend(self.holdding)
@@ -90,6 +106,8 @@ class Solitaire:
             return
         for stack in self.stacks:
             stack.cards.append(self.cards.pop())
+        self.movements += 1
+        self.score -= 1
         self.cache()
 
     def cache(self):
@@ -103,6 +121,8 @@ class Solitaire:
                 tuple(self.cards),
                 # done decks
                 self.done_decks,
+                # score
+                self.score,
             )
         )
 
@@ -111,12 +131,14 @@ class Solitaire:
         if len(self.caches) < 2:
             return False
         self.caches.pop()
-        stk, vis, crds, dne = self.caches[-1]
+        stk, vis, crds, dne, sco = self.caches[-1]
         for i, stack in enumerate(self.stacks):
             stack.cards = list(stk[i])
             stack.visible_index = vis[i]
         self.cards = list(crds)
         self.done_decks = dne
+        self.score = sco
+        self.movements += 1
         return True
 
 

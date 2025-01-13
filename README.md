@@ -4,7 +4,7 @@ Classic Spider Solitaire game written in Python.
 
 ## Current Version
 
-- Version: 1.1.0
+- Version: 1.1.1
 - Release Date: 2025-01-12
 
 ## About
